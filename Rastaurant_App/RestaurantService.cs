@@ -103,18 +103,37 @@ namespace Rastaurant_App
             try
             {
                 string[] menuLines = File.ReadAllLines(menuFilePath);
-
-                foreach (string line in menuLines)
+                
+                // i begins with 1 to skip header in csv
+                for (int i = 1; i < menuLines.Length; i++)
                 {
+                    string line = menuLines[i];
                     string[] parts = line.Split(',');
-                    if (parts.Length == 2)
+
+                    if(parts.Length == 3)
                     {
-                        string itemName = parts[0].Trim();
-                        double itemPrice = double.Parse(parts[1].Trim());
-                        Menu menuItem = new Menu(itemName, itemPrice);
+                        string category = parts[0];
+                        string name = parts[1];
+                        double itemPrice = double.Parse(parts[2]);
+
+                        Menu menuItem = new Menu(category, name, itemPrice);
                         menu.Add(menuItem);
                     }
+                    else { Console.WriteLine("This item in menu file is in wrong fomrat!"); }
                 }
+
+                // old script where csv file didn't had header lines
+                //foreach (string line in menuLines)
+                //{
+                //    string[] parts = line.Split(',');
+                //    if (parts.Length == 2)
+                //    {
+                //        string itemName = parts[0].Trim();
+                //        double itemPrice = double.Parse(parts[1].Trim());
+                //        Menu menuItem = new Menu(itemName, itemPrice);
+                //        menu.Add(menuItem);
+                //    }
+                //}
             }
             catch (FileNotFoundException)
             {
@@ -127,6 +146,17 @@ namespace Rastaurant_App
 
             return menu;
         }
+
+        public void LoadMenu(List<Menu> menu)
+        {
+			// somehow to send a parameter here to move in menu windows displaying main dishes in one, dessserts in another and etc with arrowkeys
+
+			Console.WriteLine("Menu Items2:");
+            for (int i = 0; i < menu.Count; i++)
+			{
+				Console.WriteLine($"{i + 1}. {menu[i].Name} - {menu[i].Price}");
+			}
+		}
 
         private List<Table> LoadTables(string tableFilePath)
         {

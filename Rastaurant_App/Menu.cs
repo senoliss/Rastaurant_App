@@ -14,11 +14,13 @@ namespace Rastaurant_App
 		 * and alternatively to alcohol and non acohol beverages like  
 		 * tea, juice, milkshakes, lemonades, carbonatated drinks, coffee.*/
 
+        public string Category { get; }
         public string Name { get; }
         public double Price { get; }
 
-        public Menu(string name, double price)
+        public Menu(string category, string name, double price)
         {
+            Category = category;
             Name = name;
             Price = price;
         }

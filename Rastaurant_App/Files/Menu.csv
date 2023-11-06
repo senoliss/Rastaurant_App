@@ -1,7 +1,20 @@
-Burger,10.99
-Pizza,12.49
-Pasta,8.99
-Salad,6.99
-Steak,15.99
-Soda,2.49
-Water,1.49
+MainDish,Burger,10.99
+MainDish,Pizza,12.49
+MainDish,Pasta,8.99
+MainDish,Salad,6.99
+MainDish,Steak,15.99
+Beverage,Soda,2.49
+Beverage,Water,1.49
+Beverage,Orange Juice,2.2
+Beverage,Apple Juice,2.2
+Beverage,Pear Juice,2.2
+Beverage,Water Juice,2.2
+Dessert,Ice Cream,1.79
+Dessert,Cheesecake,4.29
+Dessert,Ice Milkhsake,2.99
+Dessert,Cruassant,3
+Dessert,Doughnut,2.49
+Soup,Pumpkin,3
+Soup,Chicken,3.79
+Soup,Borsch,4.29
+Soup,Mushroom,2
