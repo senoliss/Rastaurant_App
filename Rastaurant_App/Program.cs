@@ -15,7 +15,7 @@ namespace Rastaurant_App
             Console.ForegroundColor = ConsoleColor.White;
             Console.BackgroundColor = ConsoleColor.Black;
 
-            string[] menuItems = { "1. Register Order", "2. Mark Table as vacant", "3. Checkout", "4. Exit" };
+            string[] optionItems = { "1. Register Order", "2. Mark Table as vacant", "3. Checkout", "4. Exit" };
             int selectedIndex = 0;
 
             //Console.ForegroundColor = ConsoleColor.Green;
@@ -43,7 +43,7 @@ namespace Rastaurant_App
             while (true)
             {
                 Console.Clear();
-                DrawMenu("Restaurant Service Application", menuItems, selectedIndex);
+                Drawer.DrawMenu("Restaurant Service Application", optionItems, selectedIndex);
 
                 ConsoleKey key = Console.ReadKey().Key;
 
@@ -53,10 +53,10 @@ namespace Rastaurant_App
                         selectedIndex = Math.Max(0, selectedIndex - 1);
                         break;
                     case ConsoleKey.DownArrow:
-                        selectedIndex = Math.Min(menuItems.Length - 1, selectedIndex + 1);
+                        selectedIndex = Math.Min(optionItems.Length - 1, selectedIndex + 1);
                         break;
                     case ConsoleKey.Enter:
-                        HandleMenuItemSelection(Int32.Parse(menuItems[selectedIndex].Split('.')[0]));
+                        HandleMenuItemSelection(Int32.Parse(optionItems[selectedIndex].Split('.')[0]));
                         break;
                 }
                 //            Console.WriteLine(@"
@@ -108,61 +108,7 @@ namespace Rastaurant_App
 			Exit = 4
 		}
 
-        static void DrawMenu(string title, string[] options, int selectedIndex)
-        {
-            int windowWidth = Console.WindowWidth;
-            int windowHeight = Console.WindowHeight;
-
-            // Draw the title
-            int titleX = (windowWidth - title.Length) / 2;
-            Console.SetCursorPosition(titleX, 2);
-            Console.WriteLine(title);
-
-            // Draw the menu options
-            for (int i = 0; i < options.Length; i++)
-            {
-                int optionX = (windowWidth - options[i].Length) / 2;
-                int optionY = 7 + i;
-
-                Console.SetCursorPosition(optionX, optionY);
-
-                if (i == selectedIndex)
-                {
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    Console.Write(options[i]);
-                    Console.ForegroundColor = ConsoleColor.White;
-                }
-                else
-                {
-                    Console.Write(options[i]);
-                }
-            }
-
-            // Draw the borders
-            for (int i = 0; i < windowWidth; i++)
-            {
-                Console.SetCursorPosition(i, 4);
-                Console.Write("─");
-                Console.SetCursorPosition(i, windowHeight - 2);
-                Console.Write("─");
-            }
-            for (int i = 5; i < windowHeight - 1; i++)
-            {
-                Console.SetCursorPosition(0, i);
-                Console.Write("│");
-                Console.SetCursorPosition(windowWidth - 1, i);
-                Console.Write("│");
-            }
-
-            Console.SetCursorPosition(0, 4);
-            Console.Write("┌");
-            Console.SetCursorPosition(windowWidth - 1, 4);
-            Console.Write("┐");
-            Console.SetCursorPosition(0, windowHeight - 2);
-            Console.Write("└");
-            Console.SetCursorPosition(windowWidth - 1, windowHeight - 2);
-            Console.Write("┘");
-        }
+       
         static void HandleMenuItemSelection(int choice)
         {
             RestaurantService restaurant = new RestaurantService();
