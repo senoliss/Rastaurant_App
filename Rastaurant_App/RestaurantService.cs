@@ -56,7 +56,7 @@ namespace Rastaurant_App
                     Console.WriteLine($"{i + 1}. {menu[i].Name} - {menu[i].Price}");
                 }
 
-                Console.Write("Select menu item (by number): ");
+                Console.Write("Select menu item (by number) ↑ ↓: ");
                 int menuItemNumber = int.Parse(Console.ReadLine()) - 1;
 
                 if (menuItemNumber >= 0 && menuItemNumber < menu.Count)
