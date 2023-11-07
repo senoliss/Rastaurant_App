@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace Rastaurant_App
 {
-	public class RestaurantService
-	{
+    public class RestaurantService
+    {
         /*Here we will have a Restaurant class to handle services for other classes, 
          * such as take order from customer. 
          * Mark table as occupied or vacant when customer arrives. 
@@ -48,29 +48,65 @@ namespace Rastaurant_App
             int tableNumber = int.Parse(Console.ReadLine());
 
             Table selectedTable = tables.FirstOrDefault(table => table.TableNumber == tableNumber);
+            
             if (selectedTable != null && !selectedTable.IsOccupied)
             {
-                Console.WriteLine("Menu Items:");
-                for (int i = 0; i < menu.Count; i++)
-                {
-                    Console.WriteLine($"{i + 1}. {menu[i].Name} - {menu[i].Price}");
-                }
+                selectedTable.IsOccupied = true;
+                bool orderNotFinished = true;
+                List<int> OrderedItems = new List<int>();
+                List<int> selectedIndexes = new List<int>();
+                int k = 1;
 
-                Console.Write("Select menu item (by number) ↑ ↓: ");
-                int menuItemNumber = int.Parse(Console.ReadLine()) - 1;
+                while (orderNotFinished)
+                {
+                    Console.Clear();
+                    Console.WriteLine($"Selected Table: {selectedTable.TableNumber}");
+                    Console.Write($"Selected Items:");
+                    for (int i = 0; i < OrderedItems.Count; i++)
+                    {
+                        int itemIndex = OrderedItems[i];
+                        Console.Write($"{itemIndex + 1}");
+                        if (i < OrderedItems.Count - 1)
+                        {
+                            Console.Write(",");
+                        }
+                        if (OrderedItems[i] >= 0 && OrderedItems[i] < menu.Count)
+                        {
+                            Menu selectedItem = menu[OrderedItems[i]];
+                            Order order = new Order(selectedTable.TableNumber, selectedItem, DateTime.Now);
+                            orders.Add(order);
+                        }
+                    }
+                    Console.WriteLine("\n-------------------");
+                    Console.WriteLine("Menu Items:");
+                    Console.WriteLine("-------------------");
+                    for (int i = 0; i < menu.Count; i++)
+                    {
+                        Console.WriteLine($"{i + 1}. {menu[i].Name} - {menu[i].Price}");
+                    }
 
-                if (menuItemNumber >= 0 && menuItemNumber < menu.Count)
-                {
-                    Menu selectedItem = menu[menuItemNumber];
-                    Order order = new Order(selectedTable.TableNumber, selectedItem, DateTime.Now);
-                    orders.Add(order);
-                    selectedTable.IsOccupied = true;
-                    Console.WriteLine("Order registered successfully.");
+                    Console.Write("Select menu items (numbers separated by ',') ↑ ↓: ");
+
+                    string selection = Console.ReadLine();
+                    if (selection.ToLower() == "q") orderNotFinished = false;
+                    else
+                    {
+                        try
+                        {
+                            selectedIndexes = selection.Split(',')
+                                                .Select(number => int.Parse(number) - 1)
+                                                .Where(index => index >= 0 && index < menu.Count)
+                                                .ToList();
+                        }
+                        catch
+                        {
+                            Console.WriteLine("Wrong input!");
+                            Thread.Sleep(2000);
+                        }
+                        OrderedItems.AddRange(selectedIndexes);
+                    }
                 }
-                else
-                {
-                    Console.WriteLine("Invalid menu item selection.");
-                }
+                Console.WriteLine("Order registered successfully.");
             }
             else
             {
@@ -103,14 +139,14 @@ namespace Rastaurant_App
             try
             {
                 string[] menuLines = File.ReadAllLines(menuFilePath);
-                
+
                 // i begins with 1 to skip header in csv
                 for (int i = 1; i < menuLines.Length; i++)
                 {
                     string line = menuLines[i];
                     string[] parts = line.Split(',');
 
-                    if(parts.Length == 3)
+                    if (parts.Length == 3)
                     {
                         string category = parts[0];
                         string name = parts[1];
@@ -149,14 +185,14 @@ namespace Rastaurant_App
 
         public void LoadMenu(List<Menu> menu)
         {
-			// somehow to send a parameter here to move in menu windows displaying main dishes in one, dessserts in another and etc with arrowkeys
+            // somehow to send a parameter here to move in menu windows displaying main dishes in one, dessserts in another and etc with arrowkeys
 
-			Console.WriteLine("Menu Items2:");
+            Console.WriteLine("Menu Items2:");
             for (int i = 0; i < menu.Count; i++)
-			{
-				Console.WriteLine($"{i + 1}. {menu[i].Name} - {menu[i].Price}");
-			}
-		}
+            {
+                Console.WriteLine($"{i + 1}. {menu[i].Name} - {menu[i].Price}");
+            }
+        }
 
         private List<Table> LoadTables(string tableFilePath)
         {

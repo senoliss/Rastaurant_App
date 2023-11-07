@@ -8,9 +8,9 @@ namespace Rastaurant_App
 		{
 			Console.Title = "Restaurant Servicer";
             Console.WindowWidth = 80;
-            Console.WindowHeight = 24;
+            Console.WindowHeight = 25;
             Console.BufferWidth = 80;
-            Console.BufferHeight = 24;
+            Console.BufferHeight = 25;
 
             Console.ForegroundColor = ConsoleColor.White;
             Console.BackgroundColor = ConsoleColor.Black;
