@@ -23,7 +23,9 @@ namespace Rastaurant_App
          */
         private List<Menu> menu;
         private List<Table> tables;
-        private List<Order> orders;
+        private List<Order> orders; // track all orders
+        private Table selectedTable;    // track selected tables to mark them occupied when selecting new table
+        private Dictionary<Table, List<Order>> tableOrders = new Dictionary<Table, List<Order>>();  // to track orders for specific tables
 
         public RestaurantService()
         {
@@ -36,19 +38,30 @@ namespace Rastaurant_App
         public void RegisterOrder()
         {
             Console.WriteLine("Available Tables:");
-            foreach (Table table in tables)
-            {
-                if (!table.IsOccupied)
-                {
-                    Console.WriteLine($"Table {table.TableNumber}");
-                }
-            }
+            TablePrinter();
 
             Console.Write("Enter table number: ");
             int tableNumber = int.Parse(Console.ReadLine());
 
-            Table selectedTable = tables.FirstOrDefault(table => table.TableNumber == tableNumber);
-            
+            selectedTable = tables.FirstOrDefault(table => table.TableNumber == tableNumber);
+            if (selectedTable == null)
+            {
+                Console.WriteLine("Invalid table number or table is already occupied.");
+            }
+
+
+
+            if (selectedTable.IsOccupied)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("Selected Table is occupied! Hence it is red!");
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.Write($"Do you want to order more for table {selectedTable.TableNumber} ? y/n: ");
+                string kk = Console.ReadLine();
+                if (kk == "y") selectedTable.IsOccupied = false;
+                Thread.Sleep(3000);
+            }
+
             if (selectedTable != null && !selectedTable.IsOccupied)
             {
                 selectedTable.IsOccupied = true;
@@ -61,7 +74,7 @@ namespace Rastaurant_App
                 {
                     Console.Clear();
                     Console.WriteLine($"Selected Table: {selectedTable.TableNumber}");
-                    Console.Write($"Selected Items:");
+                    Console.Write($"Now Ordered Items:");
                     for (int i = 0; i < OrderedItems.Count; i++)
                     {
                         int itemIndex = OrderedItems[i];
@@ -70,22 +83,41 @@ namespace Rastaurant_App
                         {
                             Console.Write(",");
                         }
-                        if (OrderedItems[i] >= 0 && OrderedItems[i] < menu.Count)
+                    }
+                    List<Order> newOrder = new List<Order>();
+                    orders.Clear();
+                    foreach (int itemIndex in OrderedItems)
+                    {
+                        if (itemIndex >= 0 && itemIndex < menu.Count)
                         {
-                            Menu selectedItem = menu[OrderedItems[i]];
+                            Menu selectedItem = menu[itemIndex];
                             Order order = new Order(selectedTable.TableNumber, selectedItem, DateTime.Now);
                             orders.Add(order);
                         }
+
                     }
                     Console.WriteLine("\n-------------------");
+                    // Check if the selected table already has ordered items
+                    if (tableOrders.ContainsKey(selectedTable) && tableOrders[selectedTable].Count > 0)
+                    {
+                        // Retrieve and display the ordered items from previously
+                        List<Order> orderedItems = tableOrders[selectedTable];
+                        Console.WriteLine($"Previously Ordered items for Table {selectedTable.TableNumber}:");
+                        foreach (Order order in orderedItems)
+                        {
+                            Console.WriteLine($"{order.OrderedItem.Name} - {order.OrderedItem.Price}");
+                        }
+                        Console.WriteLine("-------------------");
+                    }
                     Console.WriteLine("Menu Items:");
                     Console.WriteLine("-------------------");
                     for (int i = 0; i < menu.Count; i++)
                     {
                         Console.WriteLine($"{i + 1}. {menu[i].Name} - {menu[i].Price}");
                     }
+                    Console.WriteLine("-------------------");
 
-                    Console.Write("Select menu items (numbers separated by ',') ↑ ↓: ");
+                    Console.WriteLine("Select menu items (by one or num separated by ','), press 'q' to finish order: ");
 
                     string selection = Console.ReadLine();
                     if (selection.ToLower() == "q") orderNotFinished = false;
@@ -94,9 +126,9 @@ namespace Rastaurant_App
                         try
                         {
                             selectedIndexes = selection.Split(',')
-                                                .Select(number => int.Parse(number) - 1)
-                                                .Where(index => index >= 0 && index < menu.Count)
-                                                .ToList();
+                                .Select(number => int.Parse(number) - 1)
+                                .Where(index => index >= 0 && index < menu.Count)
+                                .ToList();
                         }
                         catch
                         {
@@ -106,31 +138,139 @@ namespace Rastaurant_App
                         OrderedItems.AddRange(selectedIndexes);
                     }
                 }
+
+                Console.Clear();
                 Console.WriteLine("Order registered successfully.");
+                Thread.Sleep(3000);
             }
-            else
+
+            if (!tableOrders.ContainsKey(selectedTable))
             {
-                Console.WriteLine("Invalid table number or table is already occupied.");
+                tableOrders[selectedTable] = new List<Order>();
             }
+            tableOrders[selectedTable].AddRange(orders);
         }
 
+        // method to make table vacant at 'MaketableVacant' option selection
         public void MarkTableAsVacant()
         {
+            TablePrinter();
             Console.Write("Enter the table number to mark as vacant: ");
-            int tableNumber = int.Parse(Console.ReadLine());
+            bool isNr = int.TryParse(Console.ReadLine(), out int tableNumber);
 
             Table selectedTable = tables.FirstOrDefault(table => table.TableNumber == tableNumber);
-            if (selectedTable != null && selectedTable.IsOccupied)
+            if (selectedTable != null && selectedTable.IsOccupied && isNr)
             {
                 selectedTable.IsOccupied = false;
                 Console.WriteLine($"Table {tableNumber} marked as vacant.");
             }
-            else
+            else if (selectedTable != null && !selectedTable.IsOccupied && isNr)
             {
-                Console.WriteLine("Invalid table number or table is not occupied.");
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                Console.WriteLine($"Selected table {selectedTable.TableNumber} is vacant!");
+                Console.ForegroundColor = ConsoleColor.White;
+                Thread.Sleep(3000);
+            }
+            else if (!isNr)
+            {
+                Console.WriteLine("Invalid table number.");
+            }
+            Console.ReadKey();
+        }
+
+        // method to mark talbe vacant on checkout
+        public void MarkTableAsVacant(Table selectedTable)
+        {
+            if (selectedTable != null && selectedTable.IsOccupied)
+            {
+                selectedTable.IsOccupied = false;
+                Console.WriteLine($"Table {selectedTable.TableNumber} marked as vacant.");
+            }
+            else if (selectedTable != null && !selectedTable.IsOccupied)
+            {
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                Console.WriteLine($"Selected table {selectedTable.TableNumber} is vacant!");
+                Console.ForegroundColor = ConsoleColor.White;
+                Thread.Sleep(3000);
             }
         }
 
+        public void Checkout()
+        {
+            Console.WriteLine("Select table to print a checque to: ");
+
+            TablePrinter();
+
+            Console.Write("Enter table number: ");
+            int tableNumber = int.Parse(Console.ReadLine());
+
+            selectedTable = tables.FirstOrDefault(table => table.TableNumber == tableNumber);
+            // Check if the selected table already has ordered items
+            if (tableOrders.ContainsKey(selectedTable) && tableOrders[selectedTable].Count > 0)
+            {
+                ConsoleKey key = ConsoleKey.Q;
+                do
+                {
+                    Console.Clear();
+                    // Retrieve and display the ordered items from previously
+                    double total = 0;
+                    List<Order> orderedItems = tableOrders[selectedTable];
+                    Console.WriteLine($"Previously Ordered items for Table {selectedTable.TableNumber}:");
+                    foreach (Order order in orderedItems)
+                    {
+                        Console.WriteLine($"{order.OrderedItem.Name} - {order.OrderedItem.Price}");
+                        total += order.OrderedItem.Price;
+                    }
+                    Console.WriteLine("-------------------");
+                    Console.WriteLine($"Total: {total}");
+                    Console.WriteLine("-------------------");
+                    //Console.WriteLine("Pay the amount (y) or hit the streets (n)? ");
+
+
+                    Console.WriteLine("Pay the amount (y) or hit the streets (n)? ");
+                    key = Console.ReadKey().Key;
+                    if (key == ConsoleKey.Y)
+                    {
+                        Console.WriteLine($"\nAmount {total} paid succesfully!");
+                        tableOrders[selectedTable].Clear();
+                        MarkTableAsVacant(selectedTable);
+                    }
+                    else if (key == ConsoleKey.N) Console.WriteLine("\nYou better run fast!");
+                    else
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("\nWRONG INPUT!");
+                        Console.ForegroundColor = ConsoleColor.White;
+                        Thread.Sleep(1500);
+                    }
+                }
+                while (key != ConsoleKey.Y && key != ConsoleKey.N);
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                Console.WriteLine($"Selected table {selectedTable.TableNumber} is vacant and does not have an open TAB!");
+                Console.ForegroundColor = ConsoleColor.White;
+            }
+
+            Console.ReadKey();
+        }
+        public void TablePrinter()
+        {
+            foreach (Table table in tables)
+            {
+                if (!table.IsOccupied)
+                {
+                    Console.WriteLine($"Table {table.TableNumber}");
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine($"Table {table.TableNumber}");
+                    Console.ForegroundColor = ConsoleColor.White;
+                }
+            }
+        }
         private List<Menu> LoadMenu(string menuFilePath)
         {
             // Load menu items from a CSV or text file
@@ -157,19 +297,6 @@ namespace Rastaurant_App
                     }
                     else { Console.WriteLine("This item in menu file is in wrong fomrat!"); }
                 }
-
-                // old script where csv file didn't had header lines
-                //foreach (string line in menuLines)
-                //{
-                //    string[] parts = line.Split(',');
-                //    if (parts.Length == 2)
-                //    {
-                //        string itemName = parts[0].Trim();
-                //        double itemPrice = double.Parse(parts[1].Trim());
-                //        Menu menuItem = new Menu(itemName, itemPrice);
-                //        menu.Add(menuItem);
-                //    }
-                //}
             }
             catch (FileNotFoundException)
             {
@@ -197,17 +324,6 @@ namespace Rastaurant_App
         private List<Table> LoadTables(string tableFilePath)
         {
             List<Table> tables = new List<Table>();
-            //Table table1 = new Table(1);
-            //Table table2 = new Table(2);
-            //Table table3 = new Table(3);
-            //Table table4 = new Table(4);
-            //Table table5 = new Table(5);
-
-            //tables.Add(table1);
-            //tables.Add(table2);
-            //tables.Add(table3);
-            //tables.Add(table4);
-            //tables.Add(table5);
 
             try
             {

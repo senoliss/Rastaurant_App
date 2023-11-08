@@ -8,15 +8,16 @@ namespace Rastaurant_App
 		{
 			Console.Title = "Restaurant Servicer";
             Console.WindowWidth = 80;
-            Console.WindowHeight = 25;
+            Console.WindowHeight = 40;
             Console.BufferWidth = 80;
-            Console.BufferHeight = 25;
+            Console.BufferHeight = 40;
 
             Console.ForegroundColor = ConsoleColor.White;
             Console.BackgroundColor = ConsoleColor.Black;
 
             string[] menuItems = { "1. Register Order", "2. Mark Table as vacant", "3. Checkout", "4. Exit" };
             int selectedIndex = 0;
+            RestaurantService restaurant = new RestaurantService();
 
             //Console.ForegroundColor = ConsoleColor.Green;
             //Console.Col
@@ -56,7 +57,7 @@ namespace Rastaurant_App
                         selectedIndex = Math.Min(menuItems.Length - 1, selectedIndex + 1);
                         break;
                     case ConsoleKey.Enter:
-                        HandleMenuItemSelection(Int32.Parse(menuItems[selectedIndex].Split('.')[0]));
+                        HandleMenuItemSelection(restaurant, Int32.Parse(menuItems[selectedIndex].Split('.')[0]));
                         break;
                 }
                 //            Console.WriteLine(@"
@@ -163,17 +164,15 @@ namespace Rastaurant_App
             Console.SetCursorPosition(windowWidth - 1, windowHeight - 2);
             Console.Write("┘");
         }
-        static void HandleMenuItemSelection(int choice)
+        static void HandleMenuItemSelection(RestaurantService restaurant, int choice)
         {
-            RestaurantService restaurant = new RestaurantService();
             Console.Clear();
             // Add logic to handle the selected menu item.
             Console.WriteLine($"Selected option: {choice}");
             if ((MenuOptions)choice == MenuOptions.RegisterOrder) restaurant.RegisterOrder();
             if ((MenuOptions)choice == MenuOptions.MarkTableAsVacant) restaurant.MarkTableAsVacant();
-            if ((MenuOptions)choice == MenuOptions.PrintCheck) restaurant.MarkTableAsVacant();
+            if ((MenuOptions)choice == MenuOptions.PrintCheck) restaurant.Checkout();
             if ((MenuOptions)choice == MenuOptions.Exit) Environment.Exit(0);
-            Console.ReadKey();
         }
     }
 }
