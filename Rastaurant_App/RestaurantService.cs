@@ -38,7 +38,7 @@ namespace Rastaurant_App
         public void RegisterOrder()
         {
             Console.WriteLine("Available Tables:");
-            TablePrinter();
+            TablePrinter(tables);
 
             Console.Write("Enter table number: ");
             int tableNumber = int.Parse(Console.ReadLine());
@@ -154,7 +154,7 @@ namespace Rastaurant_App
         // method to make table vacant at 'MaketableVacant' option selection
         public void MarkTableAsVacant()
         {
-            TablePrinter();
+            TablePrinter(tables);
             Console.Write("Enter the table number to mark as vacant: ");
             bool isNr = int.TryParse(Console.ReadLine(), out int tableNumber);
 
@@ -177,9 +177,8 @@ namespace Rastaurant_App
             }
             Console.ReadKey();
         }
-
         // method to mark talbe vacant on checkout
-        public void MarkTableAsVacant(Table selectedTable)
+        public static void MarkTableAsVacant(Table selectedTable)
         {
             if (selectedTable != null && selectedTable.IsOccupied)
             {
@@ -195,11 +194,12 @@ namespace Rastaurant_App
             }
         }
 
+        #region MovedToChequeClass
         public void Checkout()
         {
             Console.WriteLine("Select table to print a checque to: ");
 
-            TablePrinter();
+            TablePrinter(tables);
 
             Console.Write("Enter table number: ");
             int tableNumber = int.Parse(Console.ReadLine());
@@ -221,7 +221,7 @@ namespace Rastaurant_App
                         Console.WriteLine($"{order.OrderedItem.Name} - {order.OrderedItem.Price}");
                     }
                     Console.WriteLine("-------------------");
-                    Console.WriteLine($"Total: {total}");
+                    Console.WriteLine($"Total: {total:F2}");
                     Console.WriteLine("-------------------");
                     //Console.WriteLine("Pay the amount (y) or hit the streets (n)? ");
 
@@ -254,17 +254,19 @@ namespace Rastaurant_App
 
             Console.ReadKey();
         }
+
         public double CheckoutSum(Dictionary<Table, List<Order>> tableOrders, Table selectedTable)
         {
             List<Order> orderedItems = tableOrders[selectedTable];
             double total = 0;
             foreach (Order order in orderedItems)
             {
-               total += order.OrderedItem.Price;
+                total += order.OrderedItem.Price;
             }
             return total;
         }
-        public void TablePrinter()
+        #endregion
+        public static void TablePrinter(List<Table> tables)
         {
             foreach (Table table in tables)
             {
