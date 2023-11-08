@@ -213,13 +213,12 @@ namespace Rastaurant_App
                 {
                     Console.Clear();
                     // Retrieve and display the ordered items from previously
-                    double total = 0;
+                    double total = CheckoutSum(tableOrders, selectedTable);
                     List<Order> orderedItems = tableOrders[selectedTable];
                     Console.WriteLine($"Previously Ordered items for Table {selectedTable.TableNumber}:");
                     foreach (Order order in orderedItems)
                     {
                         Console.WriteLine($"{order.OrderedItem.Name} - {order.OrderedItem.Price}");
-                        total += order.OrderedItem.Price;
                     }
                     Console.WriteLine("-------------------");
                     Console.WriteLine($"Total: {total}");
@@ -254,6 +253,16 @@ namespace Rastaurant_App
             }
 
             Console.ReadKey();
+        }
+        public double CheckoutSum(Dictionary<Table, List<Order>> tableOrders, Table selectedTable)
+        {
+            List<Order> orderedItems = tableOrders[selectedTable];
+            double total = 0;
+            foreach (Order order in orderedItems)
+            {
+               total += order.OrderedItem.Price;
+            }
+            return total;
         }
         public void TablePrinter()
         {
